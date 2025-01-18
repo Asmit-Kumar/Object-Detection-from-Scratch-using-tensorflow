@@ -125,9 +125,9 @@ Plots for training and validation metrics:
 
 | Metric                   | Plot                                                                 |
 |--------------------------|----------------------------------------------------------------------|
-| Loss                     | ![Loss Plot](result/loss_plot.png)                                  |
-| Mean Absolute Error (MAE)| ![MAE Plot](result/mae_plot.png)                                    |
-| Mean Squared Error (MSE) | ![MSE Plot](result/mse_plot.png)                                    |
+| Loss                     | ![Loss Plot](result/loss.png)                                  |
+| Mean Absolute Error (MAE)| ![MAE Plot](result/mae.png)                                    |
+| Mean Squared Error (MSE) | ![MSE Plot](result/mse.png)                                    |
 
 ### Result Visuals
 Here are sample predictions visualized in the `result/` directory:
