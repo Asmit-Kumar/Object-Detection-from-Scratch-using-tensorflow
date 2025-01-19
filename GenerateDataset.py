@@ -31,7 +31,7 @@ def generateData(images):
             
                     
     for i in range(len(images)):
-        img, points = createCanvas(images.iloc[i].reshape(28, 28))
+        img, points = createCanvas(images[i].reshape(28, 28))
         saveImages(img, i)
         saveBbox(points, i)
 
