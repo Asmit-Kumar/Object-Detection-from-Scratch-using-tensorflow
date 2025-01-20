@@ -26,8 +26,7 @@ def generateData(images):
     def saveBbox(points, name):
         os.makedirs('label', exist_ok=True)
         with open(f'label/{name}.txt', 'w') as f:
-            f.write(f'''{points[0]} {points[1]}\n{points[0] + 28} {points[1]}\n
-                        {points[0]} {points[1] + 28}\n{points[0] + 28} {points[1] + 28}''')
+            f.write(f'''{points[0]} {points[1]}\n{points[0] + 28} {points[1]}\n{points[0]} {points[1] + 28}\n{points[0] + 28} {points[1] + 28}''')
             
                     
     for i in range(len(images)):
