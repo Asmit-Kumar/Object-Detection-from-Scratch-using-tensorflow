@@ -118,7 +118,6 @@ Ensure you have the following installed:
 ### Training Metrics
 The training and validation performance are measured using the following metrics:
 - Loss (Mean Squared Error)
-- Mean Absolute Error (MAE)
 - Mean Squared Error (MSE)
 
 Plots for training and validation metrics:
@@ -126,7 +125,6 @@ Plots for training and validation metrics:
 | Metric                   | Plot                                                                 |
 |--------------------------|----------------------------------------------------------------------|
 | Loss                     | ![Loss Plot](result/loss.png)                                  |
-| Mean Absolute Error (MAE)| ![MAE Plot](result/mae.png)                                    |
 | Mean Squared Error (MSE) | ![MSE Plot](result/mse.png)                                    |
 
 ### Result Visuals
