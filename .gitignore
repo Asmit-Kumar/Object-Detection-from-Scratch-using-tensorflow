@@ -1,0 +1,22 @@
+# Environments
+.venv/
+.venv1/
+.idea/
+
+# Byte-compiled / Optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Results
+Images/
+TestImages/
+label/
+Testlabel/
+class/
+result/
+csvs/
+
+Models/
+
+logs/
