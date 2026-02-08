@@ -20,3 +20,7 @@ csvs/
 Models/
 
 logs/
+
+# Root Model Files
+*.h5
+*.keras
