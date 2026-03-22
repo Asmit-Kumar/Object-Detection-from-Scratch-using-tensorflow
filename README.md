@@ -117,16 +117,7 @@ Outputs: MAE, MSE, RMSE, Mean IoU, IoU@0.50, IoU@0.75.
 
 ## 📊 Results
 
-### Prediction Visualizations
-
-Bounding box predictions (Red) vs Ground Truth (Green):
-
-| | | |
-|:---:|:---:|:---:|
-| ![Prediction 1](result/bbox_pred_1.png) | ![Prediction 2](result/bbox_pred_2.png) | ![Prediction 3](result/bbox_pred_3.png) |
-| ![Prediction 4](result/bbox_pred_4.png) | ![Prediction 5](result/bbox_pred_5.png) | |
-
-### Existing Result Samples
+### Base Model Predictions
 
 | Image | Visualization |
 |-------|---------------|
