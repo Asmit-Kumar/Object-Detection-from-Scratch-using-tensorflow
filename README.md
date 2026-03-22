@@ -210,10 +210,13 @@ Bounding box predictions — Green: Ground Truth | Red: Predicted:
 
 ### Base Model Predictions
 
-| | | |
-|:---:|:---:|:---:|
-| ![Prediction 1](result/bbox_pred_1.png) | ![Prediction 2](result/bbox_pred_2.png) | ![Prediction 3](result/bbox_pred_3.png) |
-| ![Prediction 4](result/bbox_pred_4.png) | ![Prediction 5](result/bbox_pred_5.png) | |
+| Image | Visualization |
+|-------|---------------|
+| `result/1.png` | ![1.png](result/1.png) |
+| `result/2.png` | ![2.png](result/2.png) |
+| `result/3.png` | ![3.png](result/3.png) |
+| `result/4.png` | ![4.png](result/4.png) |
+| `result/5.png` | ![5.png](result/5.png) |
 
 ---
 
