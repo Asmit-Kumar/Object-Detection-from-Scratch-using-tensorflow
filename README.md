@@ -1,155 +1,160 @@
-# Object-Detection-from-Scratch-using-tensorflow
+# Object Detection from Scratch using TensorFlow
 
-This project demonstrates an end-to-end solution for generating a custom object detection dataset using the MNIST digits dataset and training a deep learning model to predict bounding boxes for the digits in 128x128 canvas images. The results of the predictions are stored in the `result/` directory.
+A custom object detection system built entirely from scratch — from synthetic dataset generation to bounding box prediction — using TensorFlow and classical computer vision techniques.
 
----
-
-## Table of Contents
+## 📋 Table of Contents
 1. [Overview](#overview)
 2. [Features](#features)
 3. [File Structure](#file-structure)
 4. [Getting Started](#getting-started)
-   - [Prerequisites](#prerequisites)
-   - [Setup](#setup)
 5. [Usage](#usage)
-   - [Dataset Generation](#dataset-generation)
-   - [Training and Testing the Model](#training-and-testing-the-model)
-   - [Viewing Results](#viewing-results)
 6. [Results](#results)
-   - [Training Metrics](#training-metrics)
-   - [Result Visuals](#result-visuals)
-7. [Contributing](#contributing)
-8. [License](#license)
+7. [Branches](#branches)
+8. [Contributing](#contributing)
 9. [Author](#author)
 
 ---
 
-## Overview
+## 🔍 Overview
 
-This project involves generating images derived from MNIST digits and training a deep learning model to predict bounding boxes for the digits within those images.  
-It provides a practical demonstration of dataset preparation, deep learning model training, and visualization of results.
-
----
-
-## Features
-
-- **Custom Dataset Generator**:
-  - Converts MNIST digit images (28x28) into 128x128 canvas images.
-  - Places the digit randomly within the canvas.
-  - Automatically generates bounding box labels.
-- **Object Detection Model**:
-  - Deep learning model predicts bounding boxes for digits.
-  - Trains on the generated dataset using TensorFlow/Keras.
-- **Result Visualization**:
-  - Saves predicted bounding box results as images in the `result/` directory.
-  - Example result images: `result/1.png`, `result/2.png`, etc.
+This project generates synthetic training data from MNIST digits and trains a deep learning model to predict bounding boxes for the digits within 128×128 canvas images. It combines a CNN-based bounding box regression model with a classical connected-component fallback for robust detection.
 
 ---
 
-## File Structure
+## ✨ Features
+
+- **Synthetic Dataset Generator** — Converts MNIST digits (28×28) into 128×128 canvas images with random placement, generating corresponding bounding box labels
+- **CNN Bounding Box Model** — Deep learning regression model for bounding box prediction
+- **Classical Fallback Detector** — Connected-component analysis (scipy) as a robust alternative when the CNN prediction is unreliable
+- **Evaluation Metrics** — IoU, MAE, MSE for measuring detection accuracy
+- **Visualization** — Tools to overlay predicted vs actual bounding boxes
+
+---
+
+## 📂 File Structure
 
 ```
 root/
-├── GenerateDataset.py   # Dataset generation script
-├── ObjectDetect.ipynb   # Jupyter Notebook for model training and evaluation
-├── Images/              # Generated images (from dataset generation script)
-├── label/               # Bounding box labels
-├── result/              # Prediction result images (e.g., 1.png, 2.png, ...)
-├── train.csv            # MNIST dataset (required as input)
-├── requirements.txt     # Dependencies
-└── README.md            # This file
+├── GenerateDataset.py        # Synthetic dataset generator (MNIST → 128×128 canvas)
+├── ObjectDetect.ipynb        # Model training & evaluation notebook
+├── bbox_detector.py          # BboxDetector: classical connected-component detector
+├── evaluate_bbox.py          # Bbox evaluation metrics (IoU, MAE, MSE, RMSE)
+├── utils/
+│   ├── __init__.py
+│   ├── reader.py             # FileReader: image/label file I/O
+│   └── visualizer.py         # Visualizer: bbox overlay visualization
+├── requirements.txt
+├── .gitignore
+└── README.md
 ```
+
+> **Note**: Data directories (`Images/`, `TestImages/`, `label/`, `Testlabel/`), model files (`.h5`, `.keras`), and logs are gitignored. Generate them locally using the steps below.
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-Ensure you have the following installed:
-- Python 3.8 or higher
-- Libraries:
-  - `pandas`
-  - `numpy`
-  - `matplotlib`
-  - `tensorflow`
+- Python 3.8+
+- TensorFlow 2.10+
+- CUDA-compatible GPU (recommended for training)
 
-### Setup
-1. Clone the repository:
+### Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone <https://github.com/Asmit-Kumar/Object-Detection-from-Scratch-using-tensorflow>
-   cd <repository-folder>
+   git clone https://github.com/Asmit-Kumar/Object-Detection-from-Scratch-using-tensorflow.git
+   cd Object-Detection-from-Scratch-using-tensorflow
    ```
-2. Install dependencies:
+
+2. **Create a virtual environment (recommended):**
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate    # Windows
+   source .venv/bin/activate  # Linux/Mac
+   ```
+
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
 ---
 
-## Usage
+## 💻 Usage
 
 ### Dataset Generation
-1. Place the MNIST dataset (`train.csv`) in the repository root directory.
-2. Run the `GenerateDataset.py` script:
-   ```bash
-   python GenerateDataset.py
-   ```
-3. The generated images will be saved in the `Images/` directory, and corresponding bounding box labels will be stored in the `label/` directory.
 
-### Training and Testing the Model
-1. Open `ObjectDetect.ipynb` in Jupyter Notebook.
-2. Follow the steps in the notebook to:
-   - Load the generated dataset.
-   - Define the deep learning model architecture.
-   - Train the model.
-   - Evaluate the model's performance.
+Place the MNIST CSV file (`train.csv`) in the `csvs/` directory, then run:
 
-### Viewing Results
-- After training and testing, the model's predictions are visualized and saved in the `result/` directory.
-- Example result images include:
-  - `result/1.png`
-  - `result/2.png`
-  - ...
+```bash
+python GenerateDataset.py
+```
+
+This generates:
+- `Images/` — 128×128 canvas images with randomly placed digits
+- `label/` — Bounding box label files (`x_min y_min x_max y_max`)
+
+### Training
+
+Open `ObjectDetect.ipynb` in Jupyter Notebook or VS Code. The notebook covers:
+- Data loading and preprocessing
+- CNN model architecture for bbox regression
+- Training loop with MSE loss
+- Evaluation and visualization
+
+### Evaluation
+
+Evaluate the classical bounding box detection accuracy:
+
+```bash
+python evaluate_bbox.py
+```
+
+Outputs: MAE, MSE, RMSE, Mean IoU, IoU@0.50, IoU@0.75.
 
 ---
 
-## Results
+## 📊 Results
 
-### Training Metrics
-The training and validation performance are measured using the following metrics:
-- Loss (Mean Squared Error)
-- Mean Squared Error (MSE)
+### Prediction Visualizations
 
-Plots for training and validation metrics:
+Bounding box predictions (Red) vs Ground Truth (Green):
 
-| Metric                   | Plot                                                                 |
-|--------------------------|----------------------------------------------------------------------|
-| Loss                     | ![Loss Plot](result/loss.png)                                  |
-| Mean Squared Error (MSE) | ![MSE Plot](result/mse.png)                                    |
+| | | |
+|:---:|:---:|:---:|
+| ![Prediction 1](result/bbox_pred_1.png) | ![Prediction 2](result/bbox_pred_2.png) | ![Prediction 3](result/bbox_pred_3.png) |
+| ![Prediction 4](result/bbox_pred_4.png) | ![Prediction 5](result/bbox_pred_5.png) | |
 
-### Result Visuals
-Here are sample predictions visualized in the `result/` directory:
+### Existing Result Samples
 
-| Image                  | Visualization                      |
-|------------------------|-------------------------------------|
-| `result/1.png`         | ![1.png](result/1.png)             |
-| `result/2.png`         | ![2.png](result/2.png)             |
-| `result/3.png`         | ![3.png](result/3.png)             |
-| `result/4.png`         | ![4.png](result/4.png)             |
-| `result/5.png`         | ![5.png](result/5.png)             |
+| Image | Visualization |
+|-------|---------------|
+| `result/1.png` | ![1.png](result/1.png) |
+| `result/2.png` | ![2.png](result/2.png) |
+| `result/3.png` | ![3.png](result/3.png) |
+| `result/4.png` | ![4.png](result/4.png) |
+| `result/5.png` | ![5.png](result/5.png) |
+
+---
+
+## 🌿 Branches
+
+| Branch | Description |
+|--------|-------------|
+| `main` | Base object detection — dataset generation, CNN bbox model, classical fallback, evaluation |
+| `v3` | Performance-tuned model — improved architecture and training with `ObjectDetect_Performance.ipynb` |
+| `pipeline` | Full detection pipeline — integrates bbox detection (CNN + fallback) with digit classification |
 
 ---
 
 ## Contributing
 
 Contributions are welcome!  
-If you have suggestions for improvement or want to fix any issues, feel free to fork the repository, create a branch, and submit a pull request.
+Fork the repository, create a branch, and submit a pull request.
 
 ---
 
-## Author
+## 👤 Author
 
-- **Asmit Kumar**  
-  - GitHub: [Asmit-Kumar](https://github.com/Asmit-Kumar)
-
----
+- **Asmit Kumar** — [GitHub](https://github.com/Asmit-Kumar)
