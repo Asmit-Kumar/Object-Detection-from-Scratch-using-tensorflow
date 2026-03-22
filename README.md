@@ -1,11 +1,11 @@
 # Object Detection from Scratch using TensorFlow
 
-A custom object detection system built entirely from scratch — from synthetic dataset generation to bounding box prediction — using TensorFlow and classical computer vision techniques. This branch (`v3`) introduces a **performance-tuned model** with an improved architecture and training strategy.
+A complete end-to-end object detection pipeline built from scratch — from synthetic dataset generation to bounding box prediction and digit classification — using TensorFlow and classical computer vision techniques. This branch (`pipeline`) integrates **CNN bbox detection, classical fallback, and digit classification** into a single unified pipeline.
 
 ## 📋 Table of Contents
 1. [Overview](#overview)
-2. [What's New in v3](#whats-new-in-v3)
-3. [Features](#features)
+2. [Architecture](#architecture)
+3. [What's New in Pipeline](#whats-new-in-pipeline)
 4. [File Structure](#file-structure)
 5. [Getting Started](#getting-started)
 6. [Usage](#usage)
@@ -18,36 +18,64 @@ A custom object detection system built entirely from scratch — from synthetic 
 
 ## 🔍 Overview
 
-This project generates synthetic training data from MNIST digits and trains a deep learning model to predict bounding boxes for the digits within 128×128 canvas images. It combines a CNN-based bounding box regression model with a classical connected-component fallback for robust detection.
+This project implements an object detection system trained on synthetic data derived from MNIST digits. The full pipeline:
+
+1. **Localizes** the digit by predicting a bounding box (CNN regression + classical fallback)
+2. **Classifies** the detected digit (0–9)
+
+The CNN handles most predictions, and a connected-component fallback catches edge cases where the CNN fails — making the system robust in production-like scenarios.
 
 ---
 
-## 🆕 What's New in v3
+## 🏗️ Architecture
 
-- **`ObjectDetect_Performance.ipynb`** — A performance-tuned model with:
-  - Improved CNN architecture for better bbox regression
-  - Optimized training strategy (learning rate, epochs, callbacks)
-  - Built using `utils/dataset.py` for cleaner data loading
-- **`utils/dataset.py`** — `DatasetBuilder` class for loading bbox and classification datasets as TensorFlow tensors
-- **Training Curves** — Visualized model convergence:
+The `DigitDetectionPipeline` runs in three stages:
 
-  ![Training Curves - Loss & MAE](result/training_curves.png)
+```
+Input Image (128×128)
+        │
+        ▼
+┌──────────────────┐
+│  Bbox Detection   │
+│  (CNN Regression) │──── Predict [x_min, y_min, x_max, y_max]
+└────────┬─────────┘
+         │
+         │ Invalid bbox?
+         ▼
+┌──────────────────┐
+│ Classical Fallback│
+│ (Connected Comp.) │──── Binary threshold → largest component → bbox
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   Crop & Resize   │──── Extract digit region → resize to 28×28
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ Digit Classifier  │──── CNN classifier → digit (0-9) + confidence
+└──────────────────┘
+```
 
-- **Improved Predictions** — Tighter bbox predictions (Green: Ground Truth, Red: Predicted):
-
-  ![Prediction Grid](result/prediction_grid.png)
+**Key design decisions:**
+- **Fallback strategy**: If the CNN bbox prediction is invalid (NaN, negative area, out of bounds, or >90% of image), the system automatically falls back to classical connected-component analysis
+- **Batch prediction**: `predict_batch()` efficiently processes multiple images with batched model calls instead of per-image inference
+- **Experiment logging**: Built-in JSON logging tracks predictions, bbox sources (CNN vs classical), and confidence scores
 
 ---
 
-## ✨ Features
+## 🆕 What's New in Pipeline
 
-- **Synthetic Dataset Generator** — Converts MNIST digits (28×28) into 128×128 canvas images with random placement
-- **CNN Bounding Box Model** — Deep learning regression model for bounding box prediction
-- **Performance-Tuned Model** *(v3)* — Improved architecture with better convergence
-- **Classical Fallback Detector** — Connected-component analysis (scipy) as robust backup
-- **Dataset Builder Utility** *(v3)* — Clean TF tensor dataset loading for bbox and classification data
-- **Evaluation Metrics** — IoU, MAE, MSE for measuring detection accuracy
-- **Visualization** — Tools to overlay predicted vs actual bounding boxes
+- **`digit_detector.py`** — `DigitDetectionPipeline` class combining:
+  - CNN bbox regression with automatic validation
+  - Classical fallback (connected components) when CNN fails
+  - Digit classification after cropping
+  - Single-image `predict()` and efficient `predict_batch()` methods
+  - JSON experiment logging
+- **`eval_fallbacks.py`** — `Evaluator` class for analyzing CNN vs classical fallback performance:
+  - Compare IoU accuracy between both methods  
+  - Track how often each method is used
 
 ---
 
@@ -56,15 +84,21 @@ This project generates synthetic training data from MNIST digits and trains a de
 ```
 root/
 ├── GenerateDataset.py              # Synthetic dataset generator (MNIST → 128×128 canvas)
+│
 ├── ObjectDetect.ipynb              # Base model training & evaluation
 ├── ObjectDetect_Performance.ipynb  # Performance-tuned model (v3)
+│
+├── digit_detector.py               # DigitDetectionPipeline: full detect + classify pipeline
 ├── bbox_detector.py                # BboxDetector: classical connected-component detector
 ├── evaluate_bbox.py                # Bbox evaluation metrics (IoU, MAE, MSE, RMSE)
+├── eval_fallbacks.py               # CNN vs Classical fallback analysis
+│
 ├── utils/
 │   ├── __init__.py
 │   ├── reader.py                   # FileReader: image/label file I/O
 │   ├── visualizer.py               # Visualizer: bbox overlay visualization
-│   └── dataset.py                  # DatasetBuilder: TF tensor dataset loader (v3)
+│   └── dataset.py                  # DatasetBuilder: TF tensor dataset loader
+│
 ├── result/                         # Prediction visualizations and training curves
 ├── requirements.txt
 ├── .gitignore
@@ -84,7 +118,7 @@ root/
 
 1. **Clone the repository:**
    ```bash
-   git clone -b v3 https://github.com/Asmit-Kumar/Object-Detection-from-Scratch-using-tensorflow.git
+   git clone -b pipeline https://github.com/Asmit-Kumar/Object-Detection-from-Scratch-using-tensorflow.git
    cd Object-Detection-from-Scratch-using-tensorflow
    ```
 
@@ -106,8 +140,6 @@ root/
 
 ### Dataset Generation
 
-Place the MNIST CSV file (`train.csv`) in the `csvs/` directory, then run:
-
 ```bash
 python GenerateDataset.py
 ```
@@ -116,16 +148,51 @@ python GenerateDataset.py
 
 | Notebook | Purpose |
 |----------|---------|
-| `ObjectDetect.ipynb` | Base model — initial CNN architecture and training |
-| `ObjectDetect_Performance.ipynb` | **Performance model** — improved architecture, better training strategy |
+| `ObjectDetect.ipynb` | Base model — initial CNN architecture |
+| `ObjectDetect_Performance.ipynb` | Performance model — improved architecture |
+
+### Running the Detection Pipeline
+
+After training, run the full pipeline (bbox detection + digit classification):
+
+```bash
+python digit_detector.py
+```
+
+**Using the pipeline in code:**
+
+```python
+from digit_detector import DigitDetectionPipeline
+import tensorflow as tf
+
+bbox_model = tf.keras.models.load_model("bbox_model.keras")
+classifier_model = tf.keras.models.load_model("Models/DigitRecog.h5")
+
+pipeline = DigitDetectionPipeline(
+    bbox_model=bbox_model,
+    classifier_model=classifier_model,
+    normalize_bbox=True
+)
+
+# Single image prediction
+result = pipeline.predict(image)
+# → {"bbox": [x_min, y_min, x_max, y_max], "digit": 7, "confidence": 0.98}
+
+# Batch prediction (efficient)
+results = pipeline.predict_batch(images_batch, batch_size=32)
+```
 
 ### Evaluation
 
+**Bbox evaluation:**
 ```bash
 python evaluate_bbox.py
 ```
 
-Outputs: MAE, MSE, RMSE, Mean IoU, IoU@0.50, IoU@0.75.
+**CNN vs Fallback analysis:**
+```bash
+python eval_fallbacks.py
+```
 
 ---
 
@@ -155,8 +222,8 @@ Bounding box predictions — Green: Ground Truth | Red: Predicted:
 | Branch | Description |
 |--------|-------------|
 | `main` | Base object detection — dataset generation, CNN bbox model, classical fallback, evaluation |
-| **`v3`** | **← You are here** — Performance-tuned model with improved architecture and training |
-| `pipeline` | Full detection pipeline — integrates bbox detection (CNN + fallback) with digit classification |
+| `v3` | Performance-tuned model — improved architecture and training |
+| **`pipeline`** | **← You are here** — Full detection pipeline with CNN + fallback + digit classification |
 
 ---
 
