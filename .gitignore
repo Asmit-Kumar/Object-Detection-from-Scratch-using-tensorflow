@@ -1,0 +1,32 @@
+# Environments
+.venv/
+.venv1/
+.idea/
+
+# Byte-compiled / Optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data
+Images/
+TestImages/
+label/
+Testlabel/
+class/
+Testclass/
+csvs/
+
+# Model Files
+Models/
+*.h5
+*.keras
+New folder/
+
+# Logs
+logs/
+
+# Scratch / Debug scripts
+test.py
+test_model_load.py
+extract_nb_images.py
